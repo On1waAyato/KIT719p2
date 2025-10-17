@@ -50,14 +50,14 @@ We built the system as a **Career Assistant for Australian job seekers**. The br
    - *Expected output:* Paragraph grounded in OSCA chunks with citations; no salary block because routing selects RAG only.【F:router.py†L16-L33】【F:app.py†L38-L60】
 
 ## Limitations
-- **Document scope:** Only the supplied ~20-page OSCA excerpt is indexed, so questions outside those occupations or requiring cross-document synthesis may fail.【F:ingest.py†L26-L45】【F:Evaluation_GroundTruth.md†L40-L43】
-- **Keyword routing:** Acronyms or novel phrasing (e.g., "PMs" for project managers) might bypass the heuristic router or title extractor; extending the synonym list would help.【F:router.py†L13-L37】【F:app.py†L20-L34】【F:Evaluation_GroundTruth.md†L45-L49】
-- **Salary tool granularity:** The Gemini-powered salary lookup returns national-level ranges; finer breakdowns (e.g., by state) are not guaranteed.【F:tools.py†L18-L87】【F:Evaluation_GroundTruth.md†L51-L55】
+- **Document scope:** Only the supplied ~20-page OSCA excerpt is indexed, so questions outside those occupations or requiring cross-document synthesis may fail.【F:ingest.py†L26-L45】【F:Evaluation_GroundTruth.md†L52-L73】
+- **Keyword routing:** Acronyms or novel phrasing (e.g., "PMs" for project managers) might bypass the heuristic router or title extractor; extending the synonym list would help.【F:router.py†L13-L37】【F:app.py†L20-L34】【F:Evaluation_GroundTruth.md†L58-L69】
+- **Salary tool granularity:** The Gemini-powered salary lookup returns national-level ranges; finer breakdowns (e.g., by state) are not guaranteed.【F:tools.py†L18-L87】【F:Evaluation_GroundTruth.md†L70-L79】
 - **External dependency:** Both chat and tool calls require Google Generative AI access; rate limits or API errors surface directly to the UI as error traces.【F:app.py†L60-L74】【F:tools.py†L18-L87】
 
 ## Failure Point Insights
 The "Difficult Questions" evaluation identified several weak spots, and we addressed or planned mitigations accordingly:
+- **D1 – Broad compliance questions:** Retrieval fails when the question spans multiple healthcare roles; we now highlight the scope limitation in answers and recommend narrowing the query.【F:Evaluation_GroundTruth.md†L52-L60】【F:prompts.py†L1-L19】
+- **D2 – Ambiguous role titles ("PMs"):** The router/title extractor missed abbreviations; we expanded `extract_title` hints (e.g., "project manager") and noted the need for richer alias lists.【F:app.py†L26-L34】【F:Evaluation_GroundTruth.md†L62-L69】
+- **D3 – State-level salaries:** Gemini lacks per-state salary data; the system now clarifies that only national ranges are available and suggests alternative sources in responses.【F:tools.py†L18-L87】【F:Evaluation_GroundTruth.md†L70-L79】
 
-- **D1 – Broad compliance questions:** Retrieval fails when the question spans multiple healthcare roles; we now highlight the scope limitation in answers and recommend narrowing the query.【F:Evaluation_GroundTruth.md†L40-L43】【F:prompts.py†L1-L19】
-- **D2 – Ambiguous role titles ("PMs"):** The router/title extractor missed abbreviations; we expanded `extract_title` hints (e.g., "project manager") and noted the need for richer alias lists.【F:app.py†L26-L34】【F:Evaluation_GroundTruth.md†L45-L49】
-- **D3 – State-level salaries:** Gemini lacks per-state salary data; the system now clarifies that only national ranges are available and suggests alternative sources in responses.【F:tools.py†L18-L87】【F:Evaluation_GroundTruth.md†L51-L55】
