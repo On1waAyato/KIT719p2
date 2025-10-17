@@ -1,0 +1,30 @@
+app:
+  title: "Career Assistant (RAG + Tool Calling)"
+  description: "Ask about Australian occupations, tasks/skills, and salaries."
+  host: "127.0.0.1"
+  port: 7861
+
+models:
+  provider: "google_genai"
+  google:
+    model: "models/gemini-2.0-flash"  
+    temperature: 0.2
+
+rag:
+  embedding_model: "sentence-transformers/all-MiniLM-L6-v2"
+  chunk_size: 1200
+  chunk_overlap: 150
+  top_k: 4
+  index_dir: "indices"
+
+router:
+  mode: "heuristic"   # "llm" or "heuristic"
+
+tools:
+  salary_api:
+    enabled: true
+    provider: "google_genai"     
+    default_region: "Australia"
+    google:
+      model: "models/gemini-2.0-flash"   
+      currency: "AUD"

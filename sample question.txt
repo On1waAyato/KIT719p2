@@ -1,0 +1,13 @@
+🔹 RAG型（只查文档）
+
+What are the main tasks of a Project Manager?
+What skills do ICT Professionals need?
+
+🔹 TOOL型（只用薪资工具）
+
+What’s the average salary for a Project Manager in Australia?
+How much does a nurse earn per year in Australia?
+
+🔹 BOTH型（RAG + Tool）
+
+What skills do Project Manager need, and what’s their average salary in Australia?
