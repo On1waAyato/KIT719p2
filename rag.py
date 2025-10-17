@@ -57,8 +57,9 @@ class RAGIndexer:
         import numpy as np
         D, I = self.index.search(np.expand_dims(q_emb, 0), top_k)
         out = []
+        meta_len = len(self.meta)
         for idx, score in zip(I[0], D[0]):
-            if idx == -1:
+            if idx == -1 or idx >= meta_len:
                 continue
             m = self.meta[idx]
             out.append({"source_id": m["source_id"], "text": m["text"], "score": float(score)})

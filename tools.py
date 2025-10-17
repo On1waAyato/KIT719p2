@@ -1,7 +1,7 @@
 # tools.py
-import os, json, yaml
-from google import genai
-from google.genai import types
+import os, json, yaml, re
+import google.generativeai as genai
+from google.generativeai import types
 
 os.environ["GOOGLE_API_KEY"] = "AIzaSyDOLPZFapdO3hh2FFCasrbaYZqmWriUxWg"
 
