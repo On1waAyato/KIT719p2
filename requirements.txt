@@ -1,9 +1,17 @@
-gradio==4.43.0
+# UI
+gradio>=4.44.1
+gradio-client>=1.4.0
+
+# Core
 pyyaml==6.0.2
 requests==2.32.3
+numpy==1.26.4
+tqdm==4.66.5
+
+# RAG
 sentence-transformers==3.0.1
 faiss-cpu==1.8.0.post1
 pypdf==5.0.1
-numpy==1.26.4
-tqdm==4.66.5
+
+# Gemini
 google-genai>=0.3.0
