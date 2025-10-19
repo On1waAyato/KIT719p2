@@ -1,9 +1,11 @@
 # tools.py
-import os, json, yaml, re
-import google.generativeai as genai
-from google.generativeai import types
+import os
+import json
+import re
 
-os.environ["GOOGLE_API_KEY"] = "AIzaSyDOLPZFapdO3hh2FFCasrbaYZqmWriUxWg"
+import yaml
+from google import genai
+from google.genai import types
 
 class SalaryTool:
     """Call Google Generative AI to get real salary data"""

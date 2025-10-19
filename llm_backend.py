@@ -1,7 +1,7 @@
 # llm_backend.py
-import os, requests, yaml
+import os
 
-os.environ["GOOGLE_API_KEY"] = "AIzaSyDOLPZFapdO3hh2FFCasrbaYZqmWriUxWg"
+import yaml
 
 class LLM:
     def __init__(self, config_path="config.yml"):
