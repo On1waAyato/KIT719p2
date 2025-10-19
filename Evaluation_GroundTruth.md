@@ -42,11 +42,11 @@ This report summarizes baseline and difficult question evaluations for the caree
 3️⃣ **System Output:** After stating no documents were found, the system still generated a generic paragraph without stressing the scope limitation.
 4️⃣ **Failure Analysis:** **Retrieval failure + coverage gap.** The RAG index contains a single PDF, yet the router still chose RAG, leading to insufficient context and no explicit disclosure of the mismatch.
 
-### D2. Acronym-Induced Routing Error
+### D2. Acronym Coverage Gap
 1️⃣ **User Question:** “What skills do PMs need?”
 2️⃣ **Manual Ground-Truth Answer:** Interpret “PMs” as “Project Managers,” then cite `OSCA_20pages.pdf#chunk4` for leadership, planning, communication, and risk management skills.
-3️⃣ **System Output:** The router labeled the query UNKNOWN and produced only high-level soft skills with no citations.
-4️⃣ **Failure Analysis:** **Router keyword miss.** Acronyms like “PMs” are absent from the keyword lists, preventing a RAG path. `router.py` and `extract_title()` need synonym coverage.
+3️⃣ **System Output:** Retrieval produced only generic skill statements with missing citations because the acronym “PMs” failed to connect to the indexed “project manager” passages.
+4️⃣ **Failure Analysis:** **Acronym coverage gap.** Neither the keyword heuristics nor the `extract_title()` hints map “PMs” to “project manager,” so the query lacks focused retrieval or tool grounding. Expanding those synonym lists should fix it.
 
 ### D3. State-Level Salary Breakdown
 1️⃣ **User Question:** “What’s the average salary for software engineers in each Australian state?”
