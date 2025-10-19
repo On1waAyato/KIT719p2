@@ -13,7 +13,7 @@ def ensure_api_key():
     if os.getenv("GOOGLE_API_KEY"):
         return
 
-    prompt = "请输入你的 Google API Key: "
+    prompt = "Please enter your Google API Key: "
     try:
         api_key = getpass.getpass(prompt)
     except Exception:
