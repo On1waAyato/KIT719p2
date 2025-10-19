@@ -33,7 +33,7 @@ We built the system as a **Career Assistant for Australian job seekers**. The br
    python ingest.py
    ```
    This reads PDFs from `./data`, chunks them, and saves a FAISS index in `./indices`.
-3. **Set credentials:** export `GOOGLE_API_KEY` in your shell; both the LLM client and salary tool read this variable at runtime and raise if it is missing.
+3. **Set credentials:** export `GOOGLE_API_KEY` in your shell so both the LLM client and salary tool can call Gemini. If you skip this step, running `python app.py` will prompt you in the terminal to enter the key before the app launches.【F:app.py†L1-L30】【F:llm_backend.py†L24-L46】【F:tools.py†L24-L33】
 4. **Launch the app:**
    ```bash
    python app.py

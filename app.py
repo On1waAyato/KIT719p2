@@ -1,4 +1,6 @@
 import json, yaml, traceback
+import os
+import getpass
 import gradio as gr
 from rag import RAGIndexer
 from llm_backend import LLM
@@ -6,8 +8,28 @@ from tools import SalaryTool
 from router import Router
 from prompts import SYSTEM_PROMPT, ANSWER_PROMPT
 
+def ensure_api_key():
+    """Prompt the user for a Google API key if the environment variable is missing."""
+    if os.getenv("GOOGLE_API_KEY"):
+        return
+
+    prompt = "请输入你的 Google API Key: "
+    try:
+        api_key = getpass.getpass(prompt)
+    except Exception:
+        api_key = input(prompt)
+
+    api_key = api_key.strip()
+    if not api_key:
+        raise RuntimeError("GOOGLE_API_KEY is required to run the app.")
+
+    os.environ["GOOGLE_API_KEY"] = api_key
+
+
 with open("config.yml", "r") as f:
     CFG = yaml.safe_load(f)
+
+ensure_api_key()
 
 rag_idx = RAGIndexer(CFG["rag"]["embedding_model"], CFG["rag"]["index_dir"])
 llm = LLM()
