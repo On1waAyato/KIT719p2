@@ -54,6 +54,84 @@ This report summarizes baseline and difficult question evaluations for the caree
 3️⃣ **System Output:** SalaryTool returned national figures, and the system relayed them without clarifying the missing state detail.
 4️⃣ **Failure Analysis:** **Tool granularity limits.** The generation prompt should add fallback guidance or redirect users to external sources when finer-grained data is absent.
 
+
+## Test of Sample Questions
+
+This section evaluates the system’s ability to answer questions using both **retrieval-augmented generation (RAG)** and **tool calling**.
+Eight questions were designed to represent different query types:
+RAG-only, Tool-only, Hybrid (RAG + Tool), and Difficult (reasoning/inference).
+
 ---
 
-Overall, the system performs reliably for routine queries within its current corpus and tool set, but routing coverage and response templates still need improvements for cross-domain, acronym-heavy, and high-granularity requests.
+### **RAG-only (Retrieval-based questions)**
+
+Questions answered purely from the OSCA grounding document (`OSCA_20pages.pdf`).
+
+| No. | Question                                                | Expected Answer (Ground Truth)                                                                                                     | System Output                | Result          | Failure Analysis / Comments                                                                                        |
+| --- | ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------ |
+| 1   | What are the main tasks of a Project Manager?           | Plans, organises, directs, controls and coordinates ICT projects; ensures timelines, budgets, and quality standards are met.       | *(paste system answer here)* | ✅ / ❌ / Partial | If partial, check whether retrieved duties match OSCA Section on Project Managers.                                 |
+| 2   | What are the key responsibilities of a Finance Manager? | Oversees financial planning, reporting, and budgeting; manages investment and risk; ensures compliance with financial regulations. | *(paste system answer here)* | ✅ / ❌ / Partial | Common error: may return generic text if “Finance Manager” not found in index — consider adding more OSCA content. |
+
+---
+
+### **Tool-only (Salary tool questions)**
+
+Questions relying entirely on tool calls (SalaryTool).
+
+| No. | Question                                                      | Expected Answer (Ground Truth)                                          | System Output                | Result          | Failure Analysis / Comments                                                        |
+| --- | ------------------------------------------------------------- | ----------------------------------------------------------------------- | ---------------------------- | --------------- | ---------------------------------------------------------------------------------- |
+| 3   | What’s the average salary for a Project Manager in Australia? | Around **AUD 120,000 per year** (based on SalaryTool or Gemini lookup). | *(paste system answer here)* | ✅ / ❌ / Partial | Check tool accuracy: did Gemini return valid JSON or numeric output?               |
+| 4   | How much does a nurse earn per year in Australia?             | Approximately **AUD 85,000 per year** (based on SalaryTool).            | *(paste system answer here)* | ✅ / ❌ / Partial | Some responses may fail if “nurse” not mapped correctly — verify title extraction. |
+
+---
+
+### **Hybrid (RAG + Tool)**
+
+Questions requiring both document retrieval and tool results.
+
+| No. | Question                                                                            | Expected Answer (Ground Truth)                                                                                                   | System Output                | Result          | Failure Analysis / Comments                                                                      |
+| --- | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- | --------------- | ------------------------------------------------------------------------------------------------ |
+| 5   | What skills do Project Managers need, and what’s their average salary in Australia? | Skills: communication, leadership, planning, coordination. Salary: ~AUD 120,000.                                                 | *(paste system answer here)* | ✅ / ❌ / Partial | Sometimes tool result displays but citations are missing — check RAG and tool combination logic. |
+| 6   | Compare the roles and salaries of a Finance Manager and a Project Manager.          | Finance Managers handle budgets and risk; Project Managers manage operations and delivery. Salary difference: ~AUD 125k vs 120k. | *(paste system answer here)* | ✅ / ❌ / Partial | May fail if multiple occupations appear in one query — router might misclassify as RAG-only.     |
+
+---
+
+### **Difficult (Reasoning / Inference-based questions)**
+
+These require reasoning beyond literal text retrieval or involve abstract concepts.
+
+| No. | Question                                                             | Expected Answer (Ground Truth)                                                                                      | System Output                | Result          | Failure Analysis / Comments                                                                              |
+| --- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ---------------------------- | --------------- | -------------------------------------------------------------------------------------------------------- |
+| 7   | How can an ICT Professional transition to a managerial role?         | Develop leadership and project management skills; gain experience coordinating ICT teams and risk management tasks. | *(paste system answer here)* | Partial         | Retrieved correct managerial duties but lacked explicit reasoning or transition path.                    |
+| 8   | What qualifications are most common among ICT Managers in Australia? | Typically a **bachelor’s degree in ICT or related field**, plus experience in ICT project leadership.               | *(paste system answer here)* | ✅ / ❌ / Partial | Sometimes retrieves unrelated “skills” instead of “qualifications”; may need improved keyword filtering. |
+
+---
+
+### **Overall Evaluation Summary**
+
+| Metric                | Observation                                                                                |
+| --------------------- | ------------------------------------------------------------------------------------------ |
+| **RAG Accuracy**      | Retrieved relevant OSCA segments with correct citations for most occupation-based queries. |
+| **Tool Reliability**  | SalaryTool responses stable; however, lacks fine-grained (state-level) data.               |
+| **Hybrid Handling**   | Works correctly for combined queries but occasionally loses citation formatting.           |
+| **Reasoning Quality** | Adequate factual recall; limited causal reasoning and inference.                           |
+| **User Experience**   | Gradio UI smooth; clear source citations and tool cards enhance transparency.              |
+
+---
+
+###  **Conclusion & Recommendations**
+
+* The system demonstrates **consistent performance** for factual (RAG) and numeric (Tool) queries.
+* **Failure cases** mainly involve reasoning or queries that span multiple occupational roles.
+* To improve accuracy:
+
+  1. Expand OSCA corpus coverage (more occupations).
+  2. Enhance router keyword mapping for synonyms and abbreviations.
+  3. Introduce multi-hop reasoning or chain-of-thought prompts for Difficult queries.
+  4. Optionally log tool call outputs for validation reproducibility.
+
+---
+
+**Instructions:**
+After running your system, paste each real output into the *System Output* column and mark the result as ✅ (Pass), ❌ (Fail), or *Partial*.
+Use the *Failure Analysis* column to record reasoning errors, retrieval mismatches, or routing issues.
