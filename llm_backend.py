@@ -22,8 +22,8 @@ class LLM:
 
     # -------- Google Generative AI (Gemini) --------
     def _google_genai(self, system_prompt, user_prompt, temperature=None):
-        from google import genai
-        from google.genai import types
+        import google.generativeai as genai
+        from google.generativeai import types
 
         api_key = os.getenv("GOOGLE_API_KEY")
         if not api_key:

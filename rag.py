@@ -1,4 +1,4 @@
-import os, json, pickle
+import os, json, pickle, warnings
 from dataclasses import dataclass
 from typing import List, Dict, Any
 import numpy as np
@@ -19,6 +19,7 @@ class RAGIndexer:
         self.index = None
         self.meta: List[Dict[str, Any]] = []
         self.dim = self.model.get_sentence_embedding_dimension()
+        self._empty_index = False
 
     def _index_paths(self):
         return os.path.join(self.index_dir, "index.faiss"), os.path.join(self.index_dir, "meta.pkl")
@@ -35,6 +36,7 @@ class RAGIndexer:
         index.add(mat)
         self.index = index
         self.meta = meta
+        self._empty_index = False
         # persist
         ipath, mpath = self._index_paths()
         faiss.write_index(index, ipath)
@@ -44,21 +46,32 @@ class RAGIndexer:
     def load(self):
         ipath, mpath = self._index_paths()
         if not (os.path.exists(ipath) and os.path.exists(mpath)):
-            raise FileNotFoundError("Index not found. Run ingest.py first.")
+            self.index = faiss.IndexFlatIP(self.dim)
+            self.meta = []
+            self._empty_index = True
+            warnings.warn(
+                "RAG index not found. Proceeding with an empty index; run ingest.py to populate it.",
+                RuntimeWarning,
+            )
+            return
         self.index = faiss.read_index(ipath)
         with open(mpath, "rb") as f:
             self.meta = pickle.load(f)
         self.dim = self.index.d
+        self._empty_index = False
 
     def retrieve(self, query: str, top_k: int = 4):
         if self.index is None:
             self.load()
+        if self._empty_index:
+            return []
         q_emb = self.model.encode(query, normalize_embeddings=True).astype("float32")
         import numpy as np
         D, I = self.index.search(np.expand_dims(q_emb, 0), top_k)
         out = []
+        meta_len = len(self.meta)
         for idx, score in zip(I[0], D[0]):
-            if idx == -1:
+            if idx == -1 or idx >= meta_len:
                 continue
             m = self.meta[idx]
             out.append({"source_id": m["source_id"], "text": m["text"], "score": float(score)})
